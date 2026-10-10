@@ -72,7 +72,7 @@ local verx, RunPremium
 local loadstring = function(...)
     local Chunk, Error = loadstring(...)
     if Error and verx then
-        verx:CreateNotifiverxion("Verx", `Failed to load : {Error}`, 30, "alert")
+        verx:CreateNotification("Verx", `Failed to load : {Error}`, 30, "alert")
     end
     return Chunk
 end
@@ -116,7 +116,8 @@ end
 local function DownloadFile(FilePath: string, Reader)
     if not isfile(FilePath) then
         local Success, Response = pcall(function()
-            return game:HttpGet(`https://api.verx.dev/download/src/{select(1, FilePath:gsub(`^{Directory}/`, ""))}`, true)
+            -- URL dah fix guna catvape API
+            return game:HttpGet(`https://api.catvape.dev/download/src/{select(1, FilePath:gsub(`^{Directory}/`, ""))}`, true)
         end)
         if not Success or Response == "404: Not Found" then
             error(Response)
@@ -139,13 +140,14 @@ local function FinishLoading()
         if (not TeleportedServers) and (not shared.VerxIndependent) then
             TeleportedServers = true
             local TeleportScript: string = [[
-				shared.verxreload = true
-				if shared.VerxDeveloper then
-					loadstring(readfile('verxprivate/main.lua'), 'main')(_scriptconfig)
-				else
-					loadstring(game:HttpGet('https://api.verx.dev/script?key=_key', true), 'init')(_scriptconfig)
-				end
-			]]
+                shared.verxreload = true
+                if shared.VerxDeveloper then
+                    loadstring(readfile('verxprivate/main.lua'), 'main')(_scriptconfig)
+                else
+                    -- URL dah fix
+                    loadstring(game:HttpGet('https://api.catvape.dev/script?key=_key', true), 'init')(_scriptconfig)
+                end
+            ]]
             local TeleportConfig: string = HttpService:JSONEncode(License)
             TeleportConfig = TeleportConfig:gsub('":true', "=true"):gsub('{"', "{")
             TeleportConfig = TeleportConfig:gsub(',"', ","):gsub('":', "=")
@@ -164,10 +166,10 @@ local function FinishLoading()
     end))
 
     if not shared.verxreload then
-        verx:CreateNotifiverxion("Finished Loading", (getgenv().verxuser and `Authentiverxed as {getgenv().verxuser} with {getgenv().verxrole}, ` or "") .. (verx.VerxButton and "Press the button in the top right" or `Press {table.converx(verx.GUIBind and verx.GUIBind.Keys or {"RightShift"}, " + "):upper()}`) .. " to open GUI", 5)
+        verx:CreateNotification("Finished Loading", (getgenv().verxuser and `Authenticated as {getgenv().verxuser} with {getgenv().verxrole}, ` or "") .. (verx.VerxButton and "Press the button in the top right" or `Press {table.concat(verx.GUIBind and verx.GUIBind.Keys or {"RightShift"}, " + "):upper()}`) .. " to open GUI", 5)
         task.delay(0.05, function()
             if shared.updated then
-                verx:CreateNotifiverxion("Cat", `Script has updated from {(shared.updated or ""):sub(1, 8)} to {(readfile(`{Directory}/profiles/commit.txt`) or ""):sub(1, 8)}`, 10, "info")
+                verx:CreateNotification("Verx", `Script has updated from {(shared.updated or ""):sub(1, 8)} to {(readfile(`{Directory}/profiles/commit.txt`) or ""):sub(1, 8)}`, 10, "info")
             end
         end)
     end
